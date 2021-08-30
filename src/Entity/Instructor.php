@@ -14,4 +14,9 @@ class Instructor
         $this->firstname = $firstname;
         $this->lastname = $lastname;
     }
+
+    public function getLink()
+    {
+        return 'instructors/' . $this->id . '-' . urlencode($this->firstname);
+    }
 }
