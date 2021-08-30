@@ -10,14 +10,19 @@ trait SingletonTrait
     protected static $instance = null;
 
     /**
-     * @return $this
+     * @return self
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (!self::$instance) {
             self::$instance = new static();
         }
 
         return self::$instance;
+    }
+
+    public static function clearInstance(): void
+    {
+        self::$instance = null;
     }
 }

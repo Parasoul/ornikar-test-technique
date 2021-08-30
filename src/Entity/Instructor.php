@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-
 class Instructor
 {
     public int $id;
@@ -14,5 +13,10 @@ class Instructor
         $this->id = $id;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
+    }
+
+    public function getLink()
+    {
+        return 'instructors/' . $this->id . '-' . urlencode($this->firstname);
     }
 }
