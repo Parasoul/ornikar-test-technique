@@ -2,7 +2,6 @@
 
 namespace Test;
 
-
 use App\Context\ApplicationContext;
 use App\Entity\Instructor;
 use App\Entity\Learner;
@@ -13,73 +12,59 @@ use App\Repository\InstructorRepository;
 use App\Repository\LessonRepository;
 use App\Repository\MeetingPointRepository;
 use App\TemplateManager;
+use PHPUnit_Framework_TestCase;
 
-class TemplateManagerTest extends \PHPUnit_Framework_TestCase
-{
-    /**
-     * Init the mocks
-     */
-    public function setUp()
-    {
-        InstructorRepository::getInstance()->save(new Instructor(1, "jean", "rock"));
-        MeetingPointRepository::getInstance()->save(new MeetingPoint(1, "http://lambda.to", "paris 5eme"));
-        ApplicationContext::getInstance()->setCurrentUser(new Learner(1, "toto", "bob", "toto@bob.to"));
+class TemplateManagerTest extends PHPUnit_Framework_TestCase {
+	/**
+	 * Init the mocks
+	 */
+	public function setUp(): void {
+	}
 
-    }
+	/**
+	 * Closes the mocks
+	 */
+	public function tearDown(): void {
+		InstructorRepository::clearInstance();
+		MeetingPointRepository::clearInstance();
+		ApplicationContext::clearInstance();
+		LessonRepository::clearInstance();
+	}
 
-    /**
-     * Closes the mocks
-     */
-    public function tearDown()
-    {
-    }
+	public function testGetTemplateComputed_nominalCase_functional(): void {
+		$instructorFake = new Instructor(1, "jean", "rock");
+		$meetingPointFake = new MeetingPoint(1, "http://lambda.to", "paris 5eme");
+		$learnerFake = new Learner(1, "totY", "bob", "toto@bob.to");
+		$startAtFake = new \DateTime("2021-01-01 12:00:00");
+		$endAtFake = $startAtFake->add(new \DateInterval('PT1H'));
+		$lessonFake = new Lesson(1, $meetingPointFake->id, $instructorFake->id, $startAtFake, $endAtFake);
 
-    /**
-     * @test
-     */
-    public function test()
-    {
-        $expectedInstructor = InstructorRepository::getInstance()->getById(1);
-        $expectedMeetingPoint = MeetingPointRepository::getInstance()->getById(1);
-        $expectedUser = ApplicationContext::getInstance()->getCurrentUser();
-        $start_at = new \DateTime("2021-01-01 12:00:00");
-        $end_at = $start_at->add(new \DateInterval('PT1H'));
+		InstructorRepository::getInstance()
+			->save($instructorFake);
+		MeetingPointRepository::getInstance()
+			->save($meetingPointFake);
+		ApplicationContext::getInstance()
+			->setCurrentUser($learnerFake);
+		LessonRepository::getInstance()
+			->save($lessonFake);
 
-        $lesson = new Lesson(1, 1 , 1, $start_at, $end_at);
-        LessonRepository::getInstance()->save($lesson);
+		$template = new Template(
+			1,
+			'Votre leçon de conduite avec [lesson:instructor_name]',
+			"\nBonjour [user:first_name],\n\nLa reservation du [lesson:start_date] de [lesson:start_time] à [lesson:end_time] avec [lesson:instructor_name] a bien été prise en compte!\nVoici votre point de rendez-vous: [lesson:meeting_point].\n\nBien cordialement,\n\nL'équipe Ornikar\n");
 
-        $template = new Template(
-            1,
-            'Votre leçon de conduite avec [lesson:instructor_name]',
-            "
-Bonjour [user:first_name],
+		$templateManager = new TemplateManager();
 
-La reservation du [lesson:start_date] de [lesson:start_time] à [lesson:end_time] avec [lesson:instructor_name] a bien été prise en compte!
-Voici votre point de rendez-vous: [lesson:meeting_point].
+		$message = $templateManager->getTemplateComputed(
+			$template,
+			[
+				'lesson' => $lessonFake,
+			]
+		);
 
-Bien cordialement,
+		$learnerFirstnameLoweredAndUCFirst = ucfirst(strtolower($learnerFake->firstname));
 
-L'équipe Ornikar
-");
-        $templateManager = new TemplateManager();
-
-        $message = $templateManager->getTemplateComputed(
-            $template,
-            [
-                'lesson' => $lesson
-            ]
-        );
-
-        $this->assertEquals('Votre leçon de conduite avec ' . $expectedInstructor->firstname, $message->subject);
-        $this->assertEquals("
-Bonjour Toto,
-
-La reservation du " . $start_at->format('d/m/Y') . " de " . $start_at->format('H:i') . " à " . $end_at->format('H:i') . " avec " . $expectedInstructor->firstname . " a bien été prise en compte!
-Voici votre point de rendez-vous: " . $expectedMeetingPoint->name . ".
-
-Bien cordialement,
-
-L'équipe Ornikar
-", $message->content);
-    }
+		$this->assertEquals("Votre leçon de conduite avec $instructorFake->firstname", $message->subject);
+		$this->assertEquals("\nBonjour $learnerFirstnameLoweredAndUCFirst,\n\nLa reservation du {$startAtFake->format('d/m/Y')} de {$startAtFake->format('H:i')} à {$endAtFake->format('H:i')} avec $instructorFake->firstname a bien été prise en compte!\nVoici votre point de rendez-vous: $meetingPointFake->name.\n\nBien cordialement,\n\nL'équipe Ornikar\n", $message->content);
+	}
 }
