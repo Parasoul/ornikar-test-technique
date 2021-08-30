@@ -44,13 +44,8 @@
 - Creating repository, first commit
 - Setting local environment, running the code/tests
 
-- Validating the tests + upgrading => No regression of the code after the refactoring (FunctionalTests)
+- Code Reformat
 
-- Rewriting a bit of code without changing what it does.
-    - Rename variables/functions
-    - Adding getters/setters => private attributes (Won't do, out of the kata, might add a lot of refactoring in real project)
+- Validating the tests + Adding new tests if needed => No regression of the code after the refactoring (FunctionalTests)
 
-- Removing lines 13-18 from LessonRepository (Won't do => DO NOT MODIFY THIS CLASS)
-- Reformat code from all classes without affecting the functionalities (Won't do => DO NOT MODIFY THIS CLASS)
-
-- Creating interface for each repository (Interface segregation principle) (Won't do => DO NOT MODIFY THIS CLASS)
+- Rewrite/Optimize/Fix TemplateManager
