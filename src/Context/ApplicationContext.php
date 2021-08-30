@@ -16,9 +16,7 @@ class ApplicationContext
 
     protected function __construct()
     {
-
     }
-
 
     /**
      * @return Learner

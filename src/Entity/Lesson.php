@@ -2,15 +2,17 @@
 
 namespace App\Entity;
 
+use DateTime;
+
 class Lesson
 {
     public int $id;
     public int $meetingPointId;
     public int $instructorId;
-    public \DateTime $start_time;
-    public \DateTime $end_time;
+    public DateTime $start_time;
+    public DateTime $end_time;
 
-    public function __construct(int $id, int $meetingPointId, int $instructorId, \DateTime $start_time, \DateTime  $end_time)
+    public function __construct(int $id, int $meetingPointId, int $instructorId, DateTime $start_time, DateTime  $end_time)
     {
         $this->id = $id;
         $this->meetingPointId = $meetingPointId;

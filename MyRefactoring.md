@@ -38,3 +38,19 @@
 
  - Writings TUs for new classes
  - Writings TUs for TemplateManager
+
+#My real steps
+
+- Creating repository, first commit
+- Setting local environment, running the code/tests
+
+- Validating the tests + upgrading => No regression of the code after the refactoring (FunctionalTests)
+
+- Rewriting a bit of code without changing what it does.
+    - Rename variables/functions
+    - Adding getters/setters => private attributes (Won't do, out of the kata, might add a lot of refactoring in real project)
+
+- Removing lines 13-18 from LessonRepository (Won't do => DO NOT MODIFY THIS CLASS)
+- Reformat code from all classes without affecting the functionalities (Won't do => DO NOT MODIFY THIS CLASS)
+
+- Creating interface for each repository (Interface segregation principle) (Won't do => DO NOT MODIFY THIS CLASS)
