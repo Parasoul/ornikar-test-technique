@@ -12,6 +12,7 @@ use App\Repository\InstructorRepository;
 use App\Repository\LessonRepository;
 use App\Repository\MeetingPointRepository;
 use App\TemplateManager;
+use App\Utils\TextUtils;
 use PHPUnit_Framework_TestCase;
 
 class TemplateManagerTest extends PHPUnit_Framework_TestCase
@@ -49,7 +50,7 @@ class TemplateManagerTest extends PHPUnit_Framework_TestCase
         $template = new Template(
             1,
             'Votre leçon de conduite avec [lesson:instructor_name]',
-            "\nBonjour [user:first_name],\n\nLa reservation du [lesson:start_date] de [lesson:start_time] à [lesson:end_time] avec [lesson:instructor_name] a bien été prise en compte! Son lien [lesson:instructor_link].\nVoici votre point de rendez-vous: [lesson:meeting_point].\n\nBien cordialement,\n\nL'équipe Ornikar\n");
+            "\nBonjour [user:first_name],\n\nLa reservation du [lesson:start_date] de [lesson:start_time] à [lesson:end_time] avec [lesson:instructor_name] a bien été prise en compte! Son lien [lesson:instructor_link].\nRésumer de la leçon [lesson:summary], version html [lesson:summary_html].\nVoici votre point de rendez-vous: [lesson:meeting_point].\n\nBien cordialement,\n\nL'équipe Ornikar\n");
 
         $templateManager = new TemplateManager();
 
@@ -60,11 +61,11 @@ class TemplateManagerTest extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $learnerFirstnameLoweredAndUCFirstFake = ucfirst(strtolower($learnerFake->firstname));
-        $instructorLinkFake = 'instructors/' . $instructorFake->id . '-' . urlencode($instructorFake->firstname);
+        $instructorFirstnameLoweredAndUCFirst = TextUtils::getStringLoweredAndUCFirst($instructorFake->firstname);
+        $learnerFirstnameLoweredAndUCFirstFake = TextUtils::getStringLoweredAndUCFirst($learnerFake->firstname);
 
-        $this->assertEquals("Votre leçon de conduite avec $instructorFake->firstname", $messageFirst->subject);
-        $this->assertEquals("\nBonjour $learnerFirstnameLoweredAndUCFirstFake,\n\nLa reservation du {$startAtFake->format('d/m/Y')} de {$startAtFake->format('H:i')} à {$endAtFake->format('H:i')} avec $instructorFake->firstname a bien été prise en compte! Son lien $instructorLinkFake.\nVoici votre point de rendez-vous: $meetingPointFake->name.\n\nBien cordialement,\n\nL'équipe Ornikar\n", $messageFirst->content);
+        $this->assertEquals("Votre leçon de conduite avec $instructorFirstnameLoweredAndUCFirst", $messageFirst->subject);
+        $this->assertEquals("\nBonjour $learnerFirstnameLoweredAndUCFirstFake,\n\nLa reservation du {$startAtFake->format('d/m/Y')} de {$startAtFake->format('H:i')} à {$endAtFake->format('H:i')} avec $instructorFirstnameLoweredAndUCFirst a bien été prise en compte! Son lien {$instructorFake->getLink()}.\nRésumer de la leçon $lessonFake->id, version html <p>$lessonFake->id</p>.\nVoici votre point de rendez-vous: $meetingPointFake->name.\n\nBien cordialement,\n\nL'équipe Ornikar\n", $messageFirst->content);
 
         $messageSecond = $templateManager->getTemplateComputed(
             $template,
@@ -74,7 +75,7 @@ class TemplateManagerTest extends PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($template->subject, $messageSecond->subject);
-        $this->assertEquals("\nBonjour $learnerFirstnameLoweredAndUCFirstFake,\n\nLa reservation du [lesson:start_date] de [lesson:start_time] à [lesson:end_time] avec [lesson:instructor_name] a bien été prise en compte! Son lien [lesson:instructor_link].\nVoici votre point de rendez-vous: [lesson:meeting_point].\n\nBien cordialement,\n\nL'équipe Ornikar\n", $messageSecond->content);
+        $this->assertEquals("\nBonjour $learnerFirstnameLoweredAndUCFirstFake,\n\nLa reservation du [lesson:start_date] de [lesson:start_time] à [lesson:end_time] avec [lesson:instructor_name] a bien été prise en compte! Son lien [lesson:instructor_link].\nRésumer de la leçon [lesson:summary], version html [lesson:summary_html].\nVoici votre point de rendez-vous: [lesson:meeting_point].\n\nBien cordialement,\n\nL'équipe Ornikar\n", $messageSecond->content);
     }
 
     public function testGetTemplateComputed_dataWithOnlyInstructorNominal_functional(): void

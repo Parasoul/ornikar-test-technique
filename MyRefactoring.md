@@ -49,3 +49,8 @@
 - Validating the tests + Adding new tests if needed => No regression of the code after the refactoring (FunctionalTests)
 
 - Rewrite/Optimize/Fix TemplateManager
+
+- Making TemplateManager a manager / Extract business code in specialized service (Single responsibility principle)
+  - One class to transform/formatting the data => TemplateDataTransformer
+
+- Writings TUs for new classes (Not done for TemplateDataTransformer)
